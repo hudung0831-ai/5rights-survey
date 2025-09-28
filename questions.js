@@ -33,10 +33,6 @@ const conditions = [
 
 // 실제 실험 문항들 (30개)
 const questions = [
-    // 여기에 실제 30개 문항들...
-];
-
-const questions = [
     {
         id: 1,
         type: 'multiple_choice',
@@ -596,4 +592,3 @@ const questions = [
         correct: 2
     }
 ];
-
