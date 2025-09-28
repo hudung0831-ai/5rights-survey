@@ -1,4 +1,40 @@
-         // 전역 변수들
+
+// 1. 파일 로딩 확인
+alert("script.js 파일이 로딩되었습니다!");
+
+// 2. showParticipantInfo 함수 테스트 버전
+function showParticipantInfo() {
+    alert("showParticipantInfo 함수가 호출되었습니다!");
+    
+    // 기존 화면 숨기기
+    const startScreen = document.getElementById('startScreen');
+    const participantScreen = document.getElementById('participantScreen');
+    
+    if (startScreen) {
+        startScreen.style.display = 'none';
+        alert("startScreen을 숨겼습니다");
+    } else {
+        alert("startScreen을 찾을 수 없습니다!");
+    }
+    
+    if (participantScreen) {
+        participantScreen.style.display = 'block';
+        alert("participantScreen을 보여줬습니다");
+    } else {
+        alert("participantScreen을 찾을 수 없습니다!");
+    }
+}
+
+// 3. questions.js 파일 로딩 확인
+setTimeout(() => {
+    if (typeof questions !== 'undefined') {
+        alert("questions.js 파일도 정상 로딩됨!");
+    } else {
+        alert("questions.js 파일 로딩 실패!");
+    }
+}, 1000);
+
+// 전역 변수들
         let currentScreen = 'startScreen';
         let currentQuestion = 0;
         let currentCondition = 0;
