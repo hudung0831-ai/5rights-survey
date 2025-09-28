@@ -3,12 +3,12 @@
 // Google Forms 설정
 const GOOGLE_FORMS_CONFIG = {
     // Forms URL (제출용)
-    formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q/formResponse',
+    formUrl: '1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q',
     
     // 필드 ID들 (Forms에서 확인 후 입력 필요)
     fields: {
-        participantId: 'entry.123456789',  // https://docs.google.com/forms/d/e/1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q/formResponse
-        data: 'entry.987654321'            // https://docs.google.com/forms/d/e/1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q/formResponse
+        participantId: 'entry.123456789',  // entry.315076392
+        data: 'entry.987654321'            // entry.967211757
     }
 };
 
