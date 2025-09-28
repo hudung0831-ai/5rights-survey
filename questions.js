@@ -1,11 +1,11 @@
-// 예비문항 (연습용) - 수정된 버전
+// 예비문항 (연습용) - 환자 정보만 수정된 버전
 const practiceQuestions = [
     {
         id: 'practice1',
         type: 'multiple_choice',
         category: 'right_dose',
         prescription: {
-            patient: '박영수 (55세, 남)',  // 추가됨
+            patient: 'N/A',
             diagnosis: 'Pneumonia',
             order: 'Cefazolin 20g bid IV',
             time: '투약시간: 08:00, 20:00',
@@ -19,7 +19,7 @@ const practiceQuestions = [
             '200mg',
             '20mg'
         ],
-        correct: 1,  // ② 2g가 정답
+        correct: 1,
         explanation: 'Cefazolin의 일반적인 성인 용량은 1-2g이며, 20g은 과용량입니다.'
     }
 ];
@@ -31,7 +31,7 @@ const conditions = [
     { name: '여유 상황', time: 12, label: 'relaxed' }
 ];
 
-// 실제 실험 문항들 (30개) - 일부 수정됨
+// 실제 실험 문항들 (30개) - 환자 정보만 수정됨
 const questions = [
     {
         id: 1,
@@ -39,11 +39,11 @@ const questions = [
         category: 'right_drug',
         time_limit: 9,
         prescription: {
-            patient: 'N/A',  // 추가됨
+            patient: 'N/A',
             diagnosis: 'Pneumonia',
             order: 'Tazime 1g tid IV at 0800',
-            time: '',  // 추가됨
-            note: ''   // 추가됨
+            time: '',
+            note: ''
         },
         question: '다음 중 올바른 처방오더는?',
         options: [
@@ -253,7 +253,7 @@ const questions = [
         category: 'right_time',
         time_limit: 12,
         prescription: {
-            patient: '정수민 (28세, 남)',
+            patient: 'N/A',
             diagnosis: 'Headache',
             order: 'Tylenol 500mg q6hr PO',
             time: '',
@@ -446,7 +446,7 @@ const questions = [
         category: 'right_dose',
         time_limit: 12,
         prescription: {
-            patient: '김태현 (41세, 남) - 체중 80kg',
+            patient: 'N/A',
             diagnosis: 'Shock',
             order: 'Dopamine 5mcg/kg/min IV at 1200',
             time: '',
