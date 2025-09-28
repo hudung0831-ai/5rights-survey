@@ -1,51 +1,18 @@
 // 간호연구 프로젝트 - CORS 우회 버전
-// Google Apps Script 연동 (iframe 방식)
 
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby9m4kY_Xg024gJOUP3lBRAoMTIarqdNemGXQs_oL-wucnQd-UN-PnXvct2VsyJuZPdSw/exec';
-
-// 전역 변수들
-let currentScreen = 'startScreen';
-let currentQuestion = 0;
-let currentCondition = 0;
-let timeLeft = 5;
-let timerInterval;
-let participantData = {};
-let responses = [];
-let questionStartTime = 0;
-let memoryStartTime = 0;
-let currentPracticeQuestion = null;
-let experimentStartTime = null;
-
-const conditions = [
-    { name: '압박 상황', time: 5, label: 'pressure' },
-    { name: '보통 상황', time: 9, label: 'normal' },
-    { name: '여유 상황', time: 12, label: 'relaxed' }
-];
-
-// CORS 우회 데이터 전송 함수
-function sendToGoogleSheets(data) {
-    // 숨겨진 iframe을 사용하여 CORS 정책 우회
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.style.width = '1px';
-    iframe.style.height = '1px';
+// Google Forms 자동 제출
+function sendToGoogleForms() {
+    const formData = new FormData();
+    formData.append('entry.FIELD_ID', JSON.stringify({
+        participant: participantData,
+        responses: responses
+    }));
     
-    // POST 데이터를 GET 파라미터로 변환하여 전송
-    const params = new URLSearchParams({
-        data: JSON.stringify(data)
+    fetch('https://docs.google.com/forms/d/e/1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q/viewform?usp=header', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
     });
-    
-    iframe.src = `${WEBAPP_URL}?${params.toString()}`;
-    document.body.appendChild(iframe);
-    
-    // 3초 후 iframe 제거
-    setTimeout(() => {
-        if (iframe.parentNode) {
-            document.body.removeChild(iframe);
-        }
-    }, 3000);
-    
-    console.log('데이터 전송:', data.type || 'unknown');
 }
 
 // 기본 함수들
