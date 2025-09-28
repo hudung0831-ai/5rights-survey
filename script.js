@@ -49,26 +49,89 @@
             showScreen('instructionScreen');
         }
 
-        function startPractice() {
-            showScreen('practiceMemoryScreen');
-            // 3초 후 연습 문제 기억 단계 시작
-            let countdown = 3;
-            const countdownEl = document.getElementById('practiceCountdown');
-            
-            const countdownInterval = setInterval(() => {
-                if (countdown > 0) {
-                    countdownEl.textContent = `${countdown}초 후 시작됩니다...`;
-                    countdown--;
-                } else {
-                    clearInterval(countdownInterval);
-                    countdownEl.textContent = '집중하세요!';
-                    startPracticeMemory();
-                }
-            }, 1000);
-        }
+let currentPracticeQuestion = null;
+
+function startPractice() {
+             if (practiceQuestions && practiceQuestions.length > 0) {
+        currentPracticeQuestion = practiceQuestions[0];
+        showScreen('practiceMemoryScreen');
+        displayPracticeQuestion();
+                      
+        let countdown = 3;
+        const countdownEl = document.getElementById('practiceCountdown');
+        
+        const countdownInterval = setInterval(() => {
+            if (countdown > 0) {
+                countdownEl.textContent = `${countdown}초 후 시작됩니다...`;
+                countdown--;
+            } else {
+                clearInterval(countdownInterval);
+                countdownEl.textContent = '집중하세요!';
+                startPracticeMemory();
+            }
+        }, 1000);
+    } else {
+        alert('연습 문제를 불러올 수 없습니다. questions.js 파일을 확인해주세요.');
+    }
+}
+
+function displayPracticeQuestion() {
+    if (!currentPracticeQuestion) return;
+    
+    const question = currentPracticeQuestion;
+    
+    const practiceHTML = `
+        <div class="prescription-display">
+            환자: ${question.prescription.patient}<br>
+            진단: ${question.prescription.diagnosis}<br><br>
+            처방: ${question.prescription.order}<br>
+            ${question.prescription.time}<br>
+            특이사항: ${question.prescription.note}
+        </div>
+    `;
+    
+    document.getElementById('practiceContent').innerHTML = practiceHTML;
+    
+    if (question.alert) {
+        document.getElementById('practiceAlert').innerHTML = `
+            <div class="alert-display">
+                <strong>Alert:</strong> ${question.alert}
+            </div>
+        `;
+    } else {
+        document.getElementById('practiceAlert').innerHTML = '';
+    }
+}
+
+function startPracticeMemory() {
+    startMemoryTimer(5, () => {
+        showPracticeQuestionPhase();
+    });
+}
+
+function showPracticeQuestionPhase() {
+    showScreen('practiceQuestionScreen');
+    
+    if (!currentPracticeQuestion) return;
+    
+    const question = currentPracticeQuestion;
+    
+    document.getElementById('practiceQuestionTitle').textContent = question.question;
+    
+    let optionsHTML = '';
+    question.options.forEach((option, index) => {
+        optionsHTML += `
+            <label class="option">
+                <input type="radio" name="practice" value="${index}">
+                ${String.fromCharCode(65 + index)}. ${option}
+            </label>
+        `;
+    });
+    
+    document.getElementById('practiceOptions').innerHTML = optionsHTML;
+}
 
         function startPracticeMemory() {
-            // 5초 타이머 시작
             startMemoryTimer(5, () => {
                 showScreen('practiceQuestionScreen');
             });
@@ -156,6 +219,38 @@
                     처방: ${question.prescription.order}<br>
                     ${question.prescription.time}<br>
                     특이사항: ${question.prescription.note}
+
+function checkPractice() {
+    if (!currentPracticeQuestion) return;
+    
+    const selected = document.querySelector('input[name="practice"]:checked');
+    const resultDiv = document.getElementById('practiceResult');
+    
+    if (!selected) {
+        alert('답을 선택해주세요.');
+        return;
+    }
+
+    const selectedValue = parseInt(selected.value);
+    const isCorrect = selectedValue === currentPracticeQuestion.correct;
+    
+    if (isCorrect) {
+        resultDiv.innerHTML = `
+            <div style="color: green; font-weight: bold; font-size: 18px;">정답입니다! ✓</div>
+            <p>${currentPracticeQuestion.options[currentPracticeQuestion.correct]}이 정답입니다. 기억 기반 테스트의 원리를 잘 이해하셨습니다.</p>
+            <button class="btn btn-success" onclick="startExperiment()">실제 실험 시작</button>
+        `;
+    } else {
+        resultDiv.innerHTML = `
+            <div style="color: red; font-weight: bold; font-size: 18px;">아쉽습니다. ✗</div>
+            <p>정답은 ${String.fromCharCode(65 + currentPracticeQuestion.correct)}. ${currentPracticeQuestion.options[currentPracticeQuestion.correct]}입니다. 실제 실험에서는 더 집중해서 기억해보세요.</p>
+            <button class="btn btn-success" onclick="startExperiment()">실제 실험 시작</button>
+        `;
+    }
+    
+    resultDiv.style.display = 'block';
+}
+
                 </div>
             `;
             
