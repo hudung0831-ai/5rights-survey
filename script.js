@@ -1,7 +1,7 @@
 // 간호연구 프로젝트 - CORS 우회 버전
 // Google Apps Script 연동 (iframe 방식)
 
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxTrvD9BlJ_hP31yLbu6rXDezb-aWCICLqZ0vdlesREcmYB0c_QJrAJnclfuR_LR5hVww/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby9m4kY_Xg024gJOUP3lBRAoMTIarqdNemGXQs_oL-wucnQd-UN-PnXvct2VsyJuZPdSw/exec';
 
 // 전역 변수들
 let currentScreen = 'startScreen';
