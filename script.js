@@ -1,16 +1,16 @@
-// 간호연구 프로젝트 - 수정된 Google Forms 버전
+// 간호연구 프로젝트 - 최종 수정된 버전
 
-// Google Forms 설정 (실제 값으로 수정됨)
+// Google Forms 설정
 const GOOGLE_FORMS_CONFIG = {
     formId: '1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q',
     fields: {
-        participantId: 'entry.315076392',  // 실제 Entry ID
-        data: 'entry.967211757'            // 실제 Entry ID
+        participantId: 'entry.315076392',
+        data: 'entry.967211757'
     }
 };
 
 // 전역 변수들
-let currentScreen = 'startScreen';
+let currentScreen = 'participantScreen';  // 수정: 첫 화면과 일치
 let currentQuestion = 0;
 let currentCondition = 0;
 let timeLeft = 5;
@@ -22,13 +22,14 @@ let memoryStartTime = 0;
 let currentPracticeQuestion = null;
 let experimentStartTime = null;
 
+// 수정: 질문 데이터와 일치하는 조건 설정
 const conditions = [
-    { name: '단기 기억', time: 3, label: 'short' },
-    { name: '중기 기억', time: 5, label: 'medium' },
-    { name: '장기 기억', time: 10, label: 'long' }
+    { name: '압박 상황', time: 5, label: 'pressure' },
+    { name: '보통 상황', time: 9, label: 'normal' },
+    { name: '여유 상황', time: 12, label: 'relaxed' }
 ];
 
-// 수정된 Google Forms 데이터 전송 함수
+// Google Forms 데이터 전송 함수
 async function sendToGoogleForms(data) {
     try {
         console.log('Google Forms 데이터 전송 중:', data.type || 'unknown');
@@ -37,7 +38,6 @@ async function sendToGoogleForms(data) {
         formData.append(GOOGLE_FORMS_CONFIG.fields.participantId, data.participantId || '');
         formData.append(GOOGLE_FORMS_CONFIG.fields.data, JSON.stringify(data));
         
-        // 올바른 Google Forms 제출 URL
         const response = await fetch(`https://docs.google.com/forms/d/e/${GOOGLE_FORMS_CONFIG.formId}/formResponse`, {
             method: 'POST',
             mode: 'no-cors',
@@ -63,25 +63,32 @@ async function sendToGoogleForms(data) {
     }
 }
 
-// 화면 전환 함수
+// 화면 전환 함수 (안전장치 강화)
 function showScreen(screenId) {
     try {
-        document.querySelectorAll('.screen').forEach(screen => {
+        const allScreens = document.querySelectorAll('.screen');
+        if (allScreens.length === 0) {
+            console.warn('화면 요소들이 없습니다. HTML 구조를 확인하세요.');
+        }
+        
+        allScreens.forEach(screen => {
             screen.classList.remove('active');
         });
         
         const targetScreen = document.getElementById(screenId);
         if (!targetScreen) {
-            throw new Error(`화면을 찾을 수 없습니다: ${screenId}`);
+            console.error(`화면을 찾을 수 없습니다: ${screenId}`);
+            return false;
         }
         
         targetScreen.classList.add('active');
         currentScreen = screenId;
         console.log(`화면 전환: ${screenId}`);
+        return true;
         
     } catch (error) {
         console.error('화면 전환 오류:', error);
-        alert('화면 전환 중 오류가 발생했습니다.');
+        return false;
     }
 }
 
@@ -147,7 +154,9 @@ function startPractice() {
         const countdownEl = document.getElementById('practiceCountdown');
         
         if (!countdownEl) {
-            throw new Error('카운트다운 엘리먼트를 찾을 수 없습니다.');
+            console.error('연습 카운트다운 엘리먼트가 없습니다.');
+            startPracticeMemory(); // 바로 시작
+            return;
         }
         
         const countdownInterval = setInterval(() => {
@@ -188,8 +197,13 @@ function displayPracticeQuestion() {
         }
         
         const alertDiv = document.querySelector('#practiceMemoryScreen .alert-display');
-        if (alertDiv && question.alert) {
-            alertDiv.innerHTML = `<strong>Alert:</strong> ${question.alert}`;
+        if (alertDiv) {
+            if (question.alert) {
+                alertDiv.innerHTML = `<strong>Alert:</strong> ${question.alert}`;
+                alertDiv.style.display = 'block';
+            } else {
+                alertDiv.style.display = 'none';
+            }
         }
         
         updatePracticeQuestionScreen();
@@ -286,20 +300,22 @@ async function checkPractice() {
     }
 }
 
+// 수정: 타이머 안전장치 강화
 function startMemoryTimer(seconds, callback) {
     try {
         timeLeft = seconds;
         const timerEl = document.getElementById('timer');
         
         if (!timerEl) {
-            console.error('타이머 엘리먼트를 찾을 수 없습니다.');
-            callback();
+            console.warn('타이머 엘리먼트를 찾을 수 없습니다. 즉시 진행합니다.');
+            setTimeout(callback, seconds * 1000); // 백업 타이머
             return;
         }
         
         timerEl.textContent = timeLeft;
         timerEl.classList.add('show');
         
+        // 기존 타이머 정리
         if (timerInterval) {
             clearInterval(timerInterval);
         }
@@ -318,7 +334,7 @@ function startMemoryTimer(seconds, callback) {
         
     } catch (error) {
         console.error('타이머 시작 오류:', error);
-        callback();
+        setTimeout(callback, seconds * 1000); // 백업 타이머
     }
 }
 
@@ -412,8 +428,10 @@ function displayPrescription(question) {
                         <strong>Alert:</strong> ${question.alert}
                     </div>
                 `;
+                alertContent.style.display = 'block';
             } else {
                 alertContent.innerHTML = '';
+                alertContent.style.display = 'none';
             }
         }
         
@@ -429,6 +447,7 @@ function showQuestionPhase() {
         const question = questions[currentQuestion];
         const condition = conditions[currentCondition];
         
+        // UI 업데이트 (안전장치 포함)
         const conditionTitle = document.getElementById('conditionTitle');
         if (conditionTitle) {
             conditionTitle.textContent = `조건 ${currentCondition + 1}: ${condition.name} (${condition.time}초 기억)`;
@@ -467,7 +486,7 @@ function showQuestionPhase() {
     }
 }
 
-// 수정된 답안 영역 표시 (주관식 제거)
+// 답안 영역 표시 (주관식 제거됨)
 function displayAnswerArea(question) {
     const answerArea = document.getElementById('answerArea');
     if (!answerArea) {
@@ -517,7 +536,6 @@ function displayAnswerArea(question) {
     }
 }
 
-// 수정된 다음 문제 함수 (주관식 제거)
 async function nextQuestion() {
     try {
         const question = questions[currentQuestion];
@@ -561,18 +579,18 @@ async function nextQuestion() {
     }
 }
 
-// 문제 건너뛰기 함수
+// 추가: 문제 건너뛰기 함수
 async function skipCurrentQuestion() {
     try {
-        await recordResponse(null); // null 답안으로 기록
+        console.log('문제 건너뛰기:', currentQuestion + 1);
+        await recordResponse(null);
         proceedToNextQuestion();
     } catch (error) {
         console.error('문제 건너뛰기 오류:', error);
-        proceedToNextQuestion(); // 오류가 있어도 진행
+        proceedToNextQuestion();
     }
 }
 
-// 다음 문제로 진행하는 공통 함수
 function proceedToNextQuestion() {
     currentQuestion++;
     
@@ -583,6 +601,7 @@ function proceedToNextQuestion() {
             newCondition = Math.floor(Math.random() * conditions.length);
         } while (newCondition === currentCondition && conditions.length > 1);
         currentCondition = newCondition;
+        console.log('조건 변경:', conditions[currentCondition].name);
     }
     
     setTimeout(() => {
@@ -602,7 +621,7 @@ async function recordResponse(answer) {
                 isCorrect = answer === question.correct;
             } else if (question.type === 'calculation') {
                 const tolerance = question.tolerance || 0.1;
-                isCorrect = Math.abs(answer - question.correct_answer) <= tolerance;
+                isCorrect = Math.abs(answer - (question.correct_answer || question.correct)) <= tolerance;
             }
         }
         
@@ -660,6 +679,7 @@ async function endExperiment() {
             conditionIndicator.classList.remove('show');
         }
         
+        // UI 업데이트 (안전장치 포함)
         const finalParticipantId = document.getElementById('finalParticipantId');
         if (finalParticipantId) {
             finalParticipantId.textContent = participantData.id;
@@ -863,10 +883,12 @@ window.addEventListener('load', async function() {
             }, {});
             console.log('문제 유형 분포:', questionTypes);
             
-            // 주관식 문제 경고
-            if (questionTypes.subjective > 0) {
-                console.warn(`⚠️ 주관식 문제 ${questionTypes.subjective}개가 발견되었습니다. 이 버전에서는 건너뛰기 처리됩니다.`);
-            }
+            // 지원하지 않는 문제 유형 경고
+            Object.keys(questionTypes).forEach(type => {
+                if (!['multiple_choice', 'calculation'].includes(type)) {
+                    console.warn(`지원하지 않는 문제 유형 발견: ${type} (${questionTypes[type]}개)`);
+                }
+            });
             
         } else {
             console.warn('questions.js 파일이 로딩되지 않았거나 올바르지 않습니다.');
@@ -876,6 +898,18 @@ window.addEventListener('load', async function() {
             console.log('연습 문항 로드됨:', practiceQuestions.length);
         } else {
             console.warn('practiceQuestions가 정의되지 않았습니다.');
+        }
+        
+        // HTML 요소 확인
+        const requiredElements = [
+            'participantId', 'experience', 'department',
+            'timer', 'conditionIndicator', 'practiceCountdown',
+            'prescriptionContent', 'alertContent', 'answerArea'
+        ];
+        
+        const missingElements = requiredElements.filter(id => !document.getElementById(id));
+        if (missingElements.length > 0) {
+            console.warn('누락된 HTML 요소들:', missingElements);
         }
         
         // Google Forms 설정 확인
@@ -953,7 +987,8 @@ window.nursingResearch = {
         currentQuestion,
         currentCondition,
         currentScreen,
-        experimentStartTime
+        experimentStartTime,
+        conditions: conditions
     }),
     
     // 설정 확인
@@ -961,12 +996,10 @@ window.nursingResearch = {
         console.log('📋 현재 설정:');
         console.log('Form ID:', GOOGLE_FORMS_CONFIG.formId);
         console.log('Entry IDs:', GOOGLE_FORMS_CONFIG.fields);
+        console.log('조건들:', conditions);
         
         if (GOOGLE_FORMS_CONFIG.formId === 'YOUR_FORM_ID') {
             console.warn('❌ Form ID가 기본값으로 설정되어 있습니다!');
-        }
-        if (GOOGLE_FORMS_CONFIG.fields.participantId.includes('123456789')) {
-            console.warn('❌ Entry ID가 기본값으로 설정되어 있습니다!');
         }
     },
     
@@ -1005,12 +1038,19 @@ window.nursingResearch = {
         
         console.log('✅ 데이터 검증 통과');
         return true;
+    },
+    
+    // 강제 화면 전환 (디버그용)
+    goToScreen: (screenId) => {
+        console.log(`강제 화면 전환: ${screenId}`);
+        showScreen(screenId);
     }
 };
 
-console.log('🚀 간호연구 프로젝트 초기화 완료 (수정된 Google Forms 버전)');
+console.log('🚀 간호연구 프로젝트 초기화 완료 (최종 수정 버전)');
 console.log('📖 개발자 도구: window.nursingResearch 객체를 사용하세요.');
 console.log('⚙️ 설정 확인: window.nursingResearch.checkConfig()');
 console.log('💾 백업 복구: window.nursingResearch.recoverBackup()');
 console.log('🚨 응급 백업: window.nursingResearch.emergencyBackup()');
 console.log('🔍 데이터 검증: window.nursingResearch.validateData()');
+console.log('🎮 화면 전환: window.nursingResearch.goToScreen("screenId")');
