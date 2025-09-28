@@ -6,7 +6,7 @@
 // Google Sheets 설정 (연구자가 설정해야 함)
 const GOOGLE_SHEETS_CONFIG = {
     // Google Apps Script Web App URL (연구자가 생성 후 여기에 입력)
-    webAppUrl: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbxgiuxDdKSjQuMgf3r-HajqY3-9w1fQ241E2NunfIg7EoWIsLYCBT86xH_WyyAO4UxVUg/exec',
     
     // 스프레드시트 정보
     spreadsheetId: 'YOUR_SPREADSHEET_ID',
