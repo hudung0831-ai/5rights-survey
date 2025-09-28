@@ -1,10 +1,11 @@
-// 예비문항 (연습용)
+// 예비문항 (연습용) - 수정된 버전
 const practiceQuestions = [
     {
         id: 'practice1',
         type: 'multiple_choice',
         category: 'right_dose',
         prescription: {
+            patient: '박영수 (55세, 남)',  // 추가됨
             diagnosis: 'Pneumonia',
             order: 'Cefazolin 20g bid IV',
             time: '투약시간: 08:00, 20:00',
@@ -30,7 +31,7 @@ const conditions = [
     { name: '여유 상황', time: 12, label: 'relaxed' }
 ];
 
-// 실제 실험 문항들 (30개)
+// 실제 실험 문항들 (30개) - 일부 수정됨
 const questions = [
     {
         id: 1,
@@ -38,8 +39,11 @@ const questions = [
         category: 'right_drug',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',  // 추가됨
             diagnosis: 'Pneumonia',
-            order: 'Tazime 1g tid IV at 0800'
+            order: 'Tazime 1g tid IV at 0800',
+            time: '',  // 추가됨
+            note: ''   // 추가됨
         },
         question: '다음 중 올바른 처방오더는?',
         options: [
@@ -56,8 +60,11 @@ const questions = [
         category: 'right_drug',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Pain',
-            order: 'Norphin 10mg qid IM'
+            order: 'Norphin 10mg qid IM',
+            time: '',
+            note: ''
         },
         question: '다음 중 올바른 약물명은?',
         options: [
@@ -74,8 +81,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 12,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Thrombosis prevention',
-            order: 'Heparin 10 Units bid IV'
+            order: 'Heparin 10 Units bid IV',
+            time: '',
+            note: ''
         },
         alert: '출혈 위험 모니터링',
         question: 'Heparin 용량을 확인하세요. 올바른 용량은?',
@@ -83,9 +93,9 @@ const questions = [
             '10 Units',
             '100 Units',
             '1 Unit',
-            '1000 Units'
+            '0.1 Units'
         ],
-        correct: 3
+        correct: 0
     },
     {
         id: 4,
@@ -93,8 +103,11 @@ const questions = [
         category: 'right_drug',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'dehydration',
-            order: 'Normal Saline 500mL IV stat'
+            order: 'Normal Saline 500mL IV stat',
+            time: '',
+            note: ''
         },
         alert: '이 환자는 KCl 알레르기가 있습니다',
         question: '올바른 약물은?',
@@ -112,8 +125,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 12,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'HBP',
-            order: 'Propranolo 120mg bid PO'
+            order: 'Propranolo 120mg bid PO',
+            time: '',
+            note: ''
         },
         question: '다음 중 올바른 약물명과 용량은?',
         options: [
@@ -130,8 +146,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Diabetes mellitus',
-            order: 'Insulin Regular 10 Units tid IV at 0600'
+            order: 'Insulin Regular 10 Units tid IV at 0600',
+            time: '',
+            note: ''
         },
         alert: '저혈당 위험 모니터링',
         question: '올바른 용량은?',
@@ -149,8 +168,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Epilepsy',
-            order: 'Tegreto 1300mg bid PO'
+            order: 'Tegreto 1300mg bid PO',
+            time: '',
+            note: ''
         },
         question: '올바른 약물명과 용량은?',
         options: [
@@ -167,8 +189,11 @@ const questions = [
         category: 'right_route',
         time_limit: 12,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Angina pectoris',
-            order: 'Nitroglycerin 0.4mg SL stat'
+            order: 'Nitroglycerin 0.4mg SL stat',
+            time: '',
+            note: ''
         },
         alert: '혈압 강하 주의',
         question: '이 약물의 올바른 투여 경로는?',
@@ -186,8 +211,11 @@ const questions = [
         category: 'right_route',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Anxiety',
-            order: 'Ativan 2mg tid IM'
+            order: 'Ativan 2mg tid IM',
+            time: '',
+            note: ''
         },
         question: '올바른 투여 경로는?',
         options: [
@@ -204,8 +232,11 @@ const questions = [
         category: 'right_route',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Schizophrenia',
-            order: 'Haloperidol 5mg bid IM at 1400'
+            order: 'Haloperidol 5mg bid IM at 1400',
+            time: '',
+            note: ''
         },
         question: '올바른 투여 경로는?',
         options: [
@@ -224,7 +255,9 @@ const questions = [
         prescription: {
             patient: '정수민 (28세, 남)',
             diagnosis: 'Headache',
-            order: 'Tylenol 500mg q6hr PO'
+            order: 'Tylenol 500mg q6hr PO',
+            time: '',
+            note: ''
         },
         alert: '간기능 저하 환자',
         question: '현재 시간이 오후 2:30이고, 마지막 투약이 오전 10:30이었습니다. 다음 투약 시간은?',
@@ -242,15 +275,18 @@ const questions = [
         category: 'right_drug',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Sepsis',
-            order: 'Tazime 2g bid IV'
+            order: 'Tazime 2g bid IV',
+            time: '',
+            note: ''
         },
         question: '올바른 약물명은?',
         options: [
             'Tazime',
             'Tazocin',
             'Taxime',
-            'Tazime'
+            'Talazoparib'
         ],
         correct: 1
     },
@@ -260,8 +296,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'MI prevention',
-            order: 'Aspirin 3250mg PO at 0900'
+            order: 'Aspirin 3250mg PO at 0900',
+            time: '',
+            note: ''
         },
         question: '올바른 aspirin 용량은?',
         options: [
@@ -278,8 +317,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 12,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Heart failure',
-            order: 'Lasix 400mg bid IV'
+            order: 'Lasix 400mg bid IV',
+            time: '',
+            note: ''
         },
         alert: '전해질 불균형 주의',
         question: '올바른 Lasix 용량은?',
@@ -297,8 +339,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Atrial fibrillation',
-            order: 'Digoxin 0.25mg PO stat'
+            order: 'Digoxin 0.25mg PO stat',
+            time: '',
+            note: ''
         },
         question: '올바른 용량은?',
         options: [
@@ -315,8 +360,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Infection',
-            order: 'Vancomycin 1g tid IV at 0800'
+            order: 'Vancomycin 1g tid IV at 0800',
+            time: '',
+            note: ''
         },
         alert: '신기능 모니터링 필요',
         question: '올바른 용량은?',
@@ -334,8 +382,11 @@ const questions = [
         category: 'right_time',
         time_limit: 12,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Diabetes mellitus',
-            order: 'Metformin 850mg bid PO'
+            order: 'Metformin 850mg bid PO',
+            time: '',
+            note: ''
         },
         question: '현재 시간: 오전 8:00, 투약 간격: q12hr. 다음 투약 시간은?',
         options: [
@@ -352,8 +403,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Anxiety',
-            order: 'Lorazepam 1mg tid PO'
+            order: 'Lorazepam 1mg tid PO',
+            time: '',
+            note: ''
         },
         alert: '호흡억제 주의',
         question: '올바른 용량은?',
@@ -371,8 +425,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Infection',
-            order: 'Cefazolin 2g qid IV'
+            order: 'Cefazolin 2g qid IV',
+            time: '',
+            note: ''
         },
         question: '올바른 용량은?',
         options: [
@@ -391,7 +448,9 @@ const questions = [
         prescription: {
             patient: '김태현 (41세, 남) - 체중 80kg',
             diagnosis: 'Shock',
-            order: 'Dopamine 5mcg/kg/min IV at 1200'
+            order: 'Dopamine 5mcg/kg/min IV at 1200',
+            time: '',
+            note: ''
         },
         alert: '혈압 및 심박수 모니터링',
         question: '올바른 dopamine 용량은?',
@@ -409,8 +468,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Cardiac arrhythmia',
-            order: 'Amiodarone 200mg bid PO'
+            order: 'Amiodarone 200mg bid PO',
+            time: '',
+            note: ''
         },
         alert: '갑상선 기능 모니터링',
         question: '올바른 용량은?',
@@ -428,8 +490,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Anticoagulation',
-            order: 'Warfarin 5mg PO'
+            order: 'Warfarin 5mg PO',
+            time: '',
+            note: ''
         },
         alert: 'INR 수치 확인 필요',
         question: '올바른 용량은?',
@@ -447,8 +512,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 12,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Anaphylactic shock',
-            order: 'Epinephrine 1mg IM stat'
+            order: 'Epinephrine 1mg IM stat',
+            time: '',
+            note: ''
         },
         alert: '고위험 약물 - 용량 재확인',
         question: '올바른 epinephrine 용량은?',
@@ -458,7 +526,7 @@ const questions = [
             '1mg',
             '2mg'
         ],
-        correct: 0
+        correct: 2
     },
     {
         id: 24,
@@ -466,8 +534,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'HBP',
-            order: 'Metoprolol 50mg bid PO at 1800'
+            order: 'Metoprolol 50mg bid PO at 1800',
+            time: '',
+            note: ''
         },
         question: '올바른 용량은?',
         options: [
@@ -484,8 +555,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'edema',
-            order: 'Furosemide 20mg PO'
+            order: 'Furosemide 20mg PO',
+            time: '',
+            note: ''
         },
         alert: '칼륨 수치 모니터링',
         question: '올바른 용량은?',
@@ -503,8 +577,11 @@ const questions = [
         category: 'right_time',
         time_limit: 12,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'inflammation',
-            order: 'Prednisone 10mg qid PO at 0600'
+            order: 'Prednisone 10mg qid PO at 0600',
+            time: '',
+            note: ''
         },
         alert: '혈당 상승 주의',
         question: '현재 시간 오전 6:00, 첫 투약 후 다음 투약 시간은?',
@@ -522,8 +599,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'GERD',
-            order: 'Pantoprazole 40mg PO'
+            order: 'Pantoprazole 40mg PO',
+            time: '',
+            note: ''
         },
         question: '올바른 용량은?',
         options: [
@@ -540,8 +620,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 5,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'UTI (Urinary tract infection)',
-            order: 'Ciprofloxacin 500mg bid IV'
+            order: 'Ciprofloxacin 500mg bid IV',
+            time: '',
+            note: ''
         },
         question: '올바른 용량은?',
         options: [
@@ -558,8 +641,11 @@ const questions = [
         category: 'right_route',
         time_limit: 12,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Vomit',
-            order: 'Ondansetron 4mg tid IM at 2100'
+            order: 'Ondansetron 4mg tid IM at 2100',
+            time: '',
+            note: ''
         },
         alert: '심전도 모니터링 권장',
         question: '이 환자가 PO 투여가 불가능한 상태라면, 적절한 대체 경로는?',
@@ -577,8 +663,11 @@ const questions = [
         category: 'right_dose',
         time_limit: 9,
         prescription: {
+            patient: 'N/A',
             diagnosis: 'Fever',
-            order: 'Acetaminophen 650mg qid PO stat'
+            order: 'Acetaminophen 650mg qid PO stat',
+            time: '',
+            note: ''
         },
         alert: '간기능 확인 필요',
         question: '올바른 용량은?',
@@ -591,4 +680,3 @@ const questions = [
         correct: 2
     }
 ];
-
