@@ -1,3 +1,41 @@
+// 예비문항 (연습용)
+const practiceQuestions = [
+    {
+        id: 'practice1',
+        type: 'multiple_choice',
+        category: 'right_dose',
+        prescription: {
+            patient: '박영수 (55세, 남)',
+            diagnosis: 'Pneumonia',
+            order: 'Cefazolin 20g bid IV',
+            time: '투약시간: 08:00, 20:00',
+            note: '정맥 주사로 투여'
+        },
+        alert: '신기능 모니터링 필요',
+        question: '올바른 Cefazolin 용량은?',
+        options: [
+            '20g',
+            '2g',
+            '200mg',
+            '20mg'
+        ],
+        correct: 1,  // ② 2g가 정답
+        explanation: 'Cefazolin의 일반적인 성인 용량은 1-2g이며, 20g은 과용량입니다.'
+    }
+];
+
+// 실험 조건들
+const conditions = [
+    { name: '압박 상황', time: 5, label: 'pressure' },
+    { name: '보통 상황', time: 9, label: 'normal' },
+    { name: '여유 상황', time: 12, label: 'relaxed' }
+];
+
+// 실제 실험 문항들 (30개)
+const questions = [
+    // 여기에 실제 30개 문항들...
+];
+
 const questions = [
     {
         id: 1,
@@ -558,3 +596,4 @@ const questions = [
         correct: 2
     }
 ];
+
