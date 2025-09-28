@@ -1,21 +1,66 @@
-// 간호연구 프로젝트 - CORS 우회 버전
+// 간호연구 프로젝트 - Google Forms 버전
 
-// Google Forms 자동 제출
-function sendToGoogleForms() {
-    const formData = new FormData();
-    formData.append('entry.FIELD_ID', JSON.stringify({
-        participant: participantData,
-        responses: responses
-    }));
+// Google Forms 설정
+const GOOGLE_FORMS_CONFIG = {
+    // Forms URL (제출용)
+    formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q/formResponse',
     
-    fetch('https://docs.google.com/forms/d/e/1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q/viewform?usp=header', {
-        method: 'POST',
-        mode: 'no-cors',
-        body: formData
-    });
+    // 필드 ID들 (Forms에서 확인 후 입력 필요)
+    fields: {
+        participantId: 'entry.123456789',  // https://docs.google.com/forms/d/e/1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q/formResponse
+        data: 'entry.987654321'            // https://docs.google.com/forms/d/e/1FAIpQLScLTum2HGUdAe14FNhj4impp_plz55SISHaEHbbBVQVT-0Z0Q/formResponse
+    }
+};
+
+// 전역 변수들
+let currentScreen = 'startScreen';
+let currentQuestion = 0;
+let currentCondition = 0;
+let timeLeft = 5;
+let timerInterval;
+let participantData = {};
+let responses = [];
+let questionStartTime = 0;
+let memoryStartTime = 0;
+let currentPracticeQuestion = null;
+let experimentStartTime = null;
+
+const conditions = [
+    { name: '압박 상황', time: 5, label: 'pressure' },
+    { name: '보통 상황', time: 9, label: 'normal' },
+    { name: '여유 상황', time: 12, label: 'relaxed' }
+];
+
+// Google Forms 데이터 전송 함수
+function sendToGoogleForms(data) {
+    try {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        
+        // 폼 데이터 생성
+        const formData = new URLSearchParams();
+        formData.append(GOOGLE_FORMS_CONFIG.fields.participantId, data.participantId || '');
+        formData.append(GOOGLE_FORMS_CONFIG.fields.data, JSON.stringify(data));
+        
+        iframe.src = `${GOOGLE_FORMS_CONFIG.formUrl}?${formData.toString()}`;
+        document.body.appendChild(iframe);
+        
+        // 3초 후 iframe 제거
+        setTimeout(() => {
+            if (iframe.parentNode) {
+                document.body.removeChild(iframe);
+            }
+        }, 3000);
+        
+        console.log('Google Forms 데이터 전송:', data.type || 'unknown');
+    } catch (error) {
+        console.error('Google Forms 전송 실패:', error);
+    }
 }
 
-// 기본 함수들
+// 화면 전환 함수
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
@@ -43,7 +88,7 @@ function showInstructions() {
     }
     
     // 참가자 정보 전송
-    sendToGoogleSheets({
+    sendToGoogleForms({
         type: 'participant',
         participantId: participantData.id,
         experience: participantData.experience,
@@ -149,7 +194,7 @@ function checkPractice() {
     const isCorrect = selectedValue === currentPracticeQuestion.correct;
     
     // 연습문제 결과 전송
-    sendToGoogleSheets({
+    sendToGoogleForms({
         type: 'practice',
         participantId: participantData.id,
         selectedOption: selectedValue,
@@ -205,7 +250,7 @@ function startExperiment() {
     responses = [];
     
     // 실험 시작 기록
-    sendToGoogleSheets({
+    sendToGoogleForms({
         type: 'experiment_start',
         participantId: participantData.id,
         totalQuestions: questions.length,
@@ -402,8 +447,8 @@ function recordResponse(answer) {
     
     responses.push(responseData);
     
-    // 각 응답을 즉시 Google Sheets에 전송
-    sendToGoogleSheets({
+    // 각 응답을 즉시 Google Forms에 전송
+    sendToGoogleForms({
         type: 'response',
         participantId: participantData.id,
         questionId: responseData.questionId,
@@ -427,18 +472,22 @@ function endExperiment() {
     document.getElementById('completionTime').textContent = new Date().toLocaleString();
     document.getElementById('finalQuestionCount').textContent = responses.length;
     
-    // 실험 완료 기록
+    // 실험 완료 기록 - 전체 데이터를 한 번에 전송
     const totalCorrect = responses.filter(r => r.isCorrect).length;
     const accuracy = responses.length > 0 ? (totalCorrect / responses.length * 100).toFixed(1) : 0;
     
-    sendToGoogleSheets({
+    sendToGoogleForms({
         type: 'experiment_complete',
         participantId: participantData.id,
-        totalQuestions: responses.length,
-        totalCorrect: totalCorrect,
-        accuracy: accuracy,
-        experimentDuration: experimentStartTime ? 
-            (new Date() - new Date(experimentStartTime)) / 1000 / 60 : 0,
+        participant: participantData,
+        allResponses: responses,
+        summary: {
+            totalQuestions: responses.length,
+            totalCorrect: totalCorrect,
+            accuracy: accuracy,
+            experimentDuration: experimentStartTime ? 
+                (new Date() - new Date(experimentStartTime)) / 1000 / 60 : 0
+        },
         timestamp: new Date().toISOString()
     });
 }
@@ -457,7 +506,7 @@ function showResults() {
             <h3>실험 결과</h3>
             <p><strong>참가자:</strong> ${participantData.id}</p>
             <p><strong>정확도:</strong> ${mcAccuracy}%</p>
-            <p><em>모든 데이터가 Google Sheets에 저장되었습니다.</em></p>
+            <p><em>모든 데이터가 Google Forms에 저장되었습니다.</em></p>
         </div>
     `;
     
@@ -479,7 +528,7 @@ function exportResults() {
     jsonLink.download = `nursing_research_${participantData.id}_${Date.now()}.json`;
     jsonLink.click();
     
-    alert('로컬 백업 파일이 다운로드되었습니다. 메인 데이터는 Google Sheets에 저장됩니다.');
+    alert('로컬 백업 파일이 다운로드되었습니다.');
 }
 
 // 초기화
@@ -499,8 +548,8 @@ window.addEventListener('load', function() {
     }
     
     // 연결 테스트
-    console.log('Google Sheets 연결 테스트 중...');
-    sendToGoogleSheets({
+    console.log('Google Forms 연결 테스트 중...');
+    sendToGoogleForms({
         type: 'connection_test',
         timestamp: new Date().toISOString(),
         message: 'Connection test from website'
