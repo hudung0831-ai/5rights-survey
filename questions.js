@@ -5,7 +5,6 @@ const practiceQuestions = [
         type: 'multiple_choice',
         category: 'right_dose',
         prescription: {
-            patient: '박영수 (55세, 남)',
             diagnosis: 'Pneumonia',
             order: 'Cefazolin 20g bid IV',
             time: '투약시간: 08:00, 20:00',
@@ -592,3 +591,4 @@ const questions = [
         correct: 2
     }
 ];
+
