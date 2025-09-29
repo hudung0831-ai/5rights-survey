@@ -22,7 +22,7 @@ let memoryStartTime = 0;
 let currentPracticeQuestion = null;
 let experimentStartTime = null;
 
-// 수정: 질문 데이터와 일치하는 조건 설정
+// 실험 조건 설정
 const conditions = [
     { name: '압박 상황', time: 5, label: 'pressure' },
     { name: '보통 상황', time: 9, label: 'normal' },
@@ -50,7 +50,6 @@ async function sendToGoogleForms(data) {
     } catch (error) {
         console.error('Google Forms 전송 실패:', error);
         
-        // 로컬 백업 저장
         const backupKey = `backup_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         try {
             localStorage.setItem(backupKey, JSON.stringify(data));
@@ -63,7 +62,7 @@ async function sendToGoogleForms(data) {
     }
 }
 
-// 화면 전환 함수 (안전장치 강화)
+// 화면 전환 함수
 function showScreen(screenId) {
     try {
         const allScreens = document.querySelectorAll('.screen');
@@ -102,7 +101,6 @@ async function showInstructions() {
         const experience = document.getElementById('experience')?.value;
         const department = document.getElementById('department')?.value;
         
-        // 입력 검증
         if (!participantId || !experience || !department) {
             alert('모든 정보를 입력해주세요.');
             return;
@@ -120,7 +118,6 @@ async function showInstructions() {
             startTime: new Date().toISOString()
         };
         
-        // 참가자 정보 전송
         await sendToGoogleForms({
             type: 'participant',
             participantId: participantData.id,
@@ -155,7 +152,7 @@ function startPractice() {
         
         if (!countdownEl) {
             console.error('연습 카운트다운 엘리먼트가 없습니다.');
-            startPracticeMemory(); // 바로 시작
+            startPracticeMemory();
             return;
         }
         
@@ -267,7 +264,6 @@ async function checkPractice() {
         const selectedValue = parseInt(selected.value);
         const isCorrect = selectedValue === currentPracticeQuestion.correct;
         
-        // 연습문제 결과 전송
         await sendToGoogleForms({
             type: 'practice',
             participantId: participantData.id,
@@ -300,7 +296,6 @@ async function checkPractice() {
     }
 }
 
-// 수정: 타이머 안전장치 강화
 function startMemoryTimer(seconds, callback) {
     try {
         timeLeft = seconds;
@@ -308,14 +303,13 @@ function startMemoryTimer(seconds, callback) {
         
         if (!timerEl) {
             console.warn('타이머 엘리먼트를 찾을 수 없습니다. 즉시 진행합니다.');
-            setTimeout(callback, seconds * 1000); // 백업 타이머
+            setTimeout(callback, seconds * 1000);
             return;
         }
         
         timerEl.textContent = timeLeft;
         timerEl.classList.add('show');
         
-        // 기존 타이머 정리
         if (timerInterval) {
             clearInterval(timerInterval);
         }
@@ -334,7 +328,7 @@ function startMemoryTimer(seconds, callback) {
         
     } catch (error) {
         console.error('타이머 시작 오류:', error);
-        setTimeout(callback, seconds * 1000); // 백업 타이머
+        setTimeout(callback, seconds * 1000);
     }
 }
 
@@ -355,7 +349,6 @@ async function startExperiment() {
         currentCondition = Math.floor(Math.random() * conditions.length);
         responses = [];
         
-        // 실험 시작 기록
         await sendToGoogleForms({
             type: 'experiment_start',
             participantId: participantData.id,
@@ -447,7 +440,6 @@ function showQuestionPhase() {
         const question = questions[currentQuestion];
         const condition = conditions[currentCondition];
         
-        // UI 업데이트 (안전장치 포함)
         const conditionTitle = document.getElementById('conditionTitle');
         if (conditionTitle) {
             conditionTitle.textContent = `조건 ${currentCondition + 1}: ${condition.name} (${condition.time}초 기억)`;
@@ -486,7 +478,6 @@ function showQuestionPhase() {
     }
 }
 
-// 답안 영역 표시 (주관식 제거됨)
 function displayAnswerArea(question) {
     const answerArea = document.getElementById('answerArea');
     if (!answerArea) {
@@ -520,7 +511,6 @@ function displayAnswerArea(question) {
                 </div>
             `;
         } else {
-            // 지원하지 않는 문제 유형
             console.warn('지원하지 않는 문제 유형:', question.type);
             answerArea.innerHTML = `
                 <div class="error-message">
@@ -562,7 +552,6 @@ async function nextQuestion() {
                 return;
             }
         } else {
-            // 지원하지 않는 문제 유형은 건너뛰기
             console.warn('지원하지 않는 문제 유형 건너뛰기:', question.type);
             answer = null;
             isValid = true;
@@ -579,7 +568,6 @@ async function nextQuestion() {
     }
 }
 
-// 추가: 문제 건너뛰기 함수
 async function skipCurrentQuestion() {
     try {
         console.log('문제 건너뛰기:', currentQuestion + 1);
@@ -594,7 +582,6 @@ async function skipCurrentQuestion() {
 function proceedToNextQuestion() {
     currentQuestion++;
     
-    // 10문항마다 조건 변경
     if (currentQuestion % 10 === 0 && currentQuestion < questions.length) {
         let newCondition;
         do {
@@ -641,7 +628,6 @@ async function recordResponse(answer) {
         
         responses.push(responseData);
         
-        // 각 응답을 즉시 Google Forms에 전송
         await sendToGoogleForms({
             type: 'response',
             participantId: participantData.id,
@@ -659,7 +645,6 @@ async function recordResponse(answer) {
         
     } catch (error) {
         console.error('응답 기록 오류:', error);
-        // 로컬에라도 저장
         responses.push({
             questionId: question?.id || currentQuestion,
             answer: answer,
@@ -679,7 +664,6 @@ async function endExperiment() {
             conditionIndicator.classList.remove('show');
         }
         
-        // UI 업데이트 (안전장치 포함)
         const finalParticipantId = document.getElementById('finalParticipantId');
         if (finalParticipantId) {
             finalParticipantId.textContent = participantData.id;
@@ -695,7 +679,6 @@ async function endExperiment() {
             finalQuestionCount.textContent = responses.length;
         }
         
-        // 실험 완료 기록
         const multipleChoiceResponses = responses.filter(r => r.type === 'multiple_choice');
         const calculationResponses = responses.filter(r => r.type === 'calculation');
         const totalCorrect = responses.filter(r => r.isCorrect === true).length;
@@ -806,92 +789,14 @@ function exportResults() {
     }
 }
 
-// 백업 데이터 복구 함수
-function recoverBackupData() {
-    try {
-        const backupKeys = Object.keys(localStorage).filter(key => key.startsWith('backup_'));
-        if (backupKeys.length === 0) {
-            alert('백업 데이터가 없습니다.');
-            return;
-        }
-        
-        console.log(`${backupKeys.length}개의 백업 데이터를 발견했습니다.`);
-        
-        const backupData = backupKeys.map(key => {
-            try {
-                return {
-                    key: key,
-                    data: JSON.parse(localStorage.getItem(key)),
-                    timestamp: key.split('_')[1]
-                };
-            } catch (e) {
-                console.error('백업 데이터 파싱 오류:', e);
-                return null;
-            }
-        }).filter(item => item !== null);
-        
-        if (backupData.length > 0) {
-            console.log('백업 데이터:', backupData);
-            alert(`${backupData.length}개의 백업 데이터가 있습니다. 콘솔을 확인해주세요.`);
-        }
-        
-    } catch (error) {
-        console.error('백업 데이터 복구 오류:', error);
-    }
-}
-
-// 응급 백업 함수
-function emergencyBackup() {
-    try {
-        const emergencyData = {
-            participantData,
-            responses,
-            timestamp: new Date().toISOString(),
-            type: 'emergency_backup'
-        };
-        
-        const dataStr = JSON.stringify(emergencyData, null, 2);
-        const blob = new Blob([dataStr], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `emergency_backup_${participantData.id || 'unknown'}_${Date.now()}.json`;
-        link.click();
-        
-        URL.revokeObjectURL(url);
-        console.log('응급 백업 완료');
-        
-    } catch (error) {
-        console.error('응급 백업 오류:', error);
-    }
-}
-
-// 초기화 및 이벤트 리스너
 window.addEventListener('load', async function() {
     try {
         console.log('간호연구 프로젝트 로드 완료');
         
-        // 필수 데이터 확인
         if (typeof questions !== 'undefined' && Array.isArray(questions)) {
             console.log('총 문항 수:', questions.length);
-            
-            // 문제 유형 분석
-            const questionTypes = questions.reduce((acc, q) => {
-                acc[q.type] = (acc[q.type] || 0) + 1;
-                return acc;
-            }, {});
-            console.log('문제 유형 분포:', questionTypes);
-            
-            // 지원하지 않는 문제 유형 경고
-            Object.keys(questionTypes).forEach(type => {
-                if (!['multiple_choice', 'calculation'].includes(type)) {
-                    console.warn(`지원하지 않는 문제 유형 발견: ${type} (${questionTypes[type]}개)`);
-                }
-            });
-            
         } else {
-            console.warn('questions.js 파일이 로딩되지 않았거나 올바르지 않습니다.');
+            console.warn('questions.js 파일이 로딩되지 않았습니다.');
         }
         
         if (typeof practiceQuestions !== 'undefined' && Array.isArray(practiceQuestions)) {
@@ -900,25 +805,8 @@ window.addEventListener('load', async function() {
             console.warn('practiceQuestions가 정의되지 않았습니다.');
         }
         
-        // HTML 요소 확인
-        const requiredElements = [
-            'participantId', 'experience', 'department',
-            'timer', 'conditionIndicator', 'practiceCountdown',
-            'prescriptionContent', 'alertContent', 'answerArea'
-        ];
+        console.log('Google Forms 설정:', GOOGLE_FORMS_CONFIG);
         
-        const missingElements = requiredElements.filter(id => !document.getElementById(id));
-        if (missingElements.length > 0) {
-            console.warn('누락된 HTML 요소들:', missingElements);
-        }
-        
-        // Google Forms 설정 확인
-        console.log('Google Forms 설정 확인:');
-        console.log('Form ID:', GOOGLE_FORMS_CONFIG.formId);
-        console.log('Entry IDs:', GOOGLE_FORMS_CONFIG.fields);
-        
-        // 연결 테스트
-        console.log('Google Forms 연결 테스트 중...');
         try {
             await sendToGoogleForms({
                 type: 'connection_test',
@@ -928,7 +816,7 @@ window.addEventListener('load', async function() {
             });
             console.log('✅ Google Forms 연결 테스트 완료');
         } catch (error) {
-            console.warn('⚠️ Google Forms 연결 테스트 실패, 로컬 백업 모드로 동작:', error.message);
+            console.warn('⚠️ Google Forms 연결 테스트 실패:', error.message);
         }
         
     } catch (error) {
@@ -937,7 +825,6 @@ window.addEventListener('load', async function() {
     }
 });
 
-// 페이지 종료 시 경고
 window.addEventListener('beforeunload', function(e) {
     if (responses.length > 0 && currentScreen !== 'completeScreen') {
         e.preventDefault();
@@ -946,12 +833,11 @@ window.addEventListener('beforeunload', function(e) {
     }
 });
 
-// 페이지 숨김/표시 이벤트 처리
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
         if (timerInterval && timeLeft > 0) {
             clearInterval(timerInterval);
-            console.log('타이머 일시정지 (페이지 숨김)');
+            console.log('타이머 일시정지');
         }
     } else {
         if (timeLeft > 0 && !timerInterval) {
@@ -960,97 +846,18 @@ document.addEventListener('visibilitychange', function() {
                     showQuestionPhase();
                 }
             });
-            console.log('타이머 재시작 (페이지 표시)');
+            console.log('타이머 재시작');
         }
     }
 });
 
-// 글로벌 에러 핸들러
 window.addEventListener('error', function(e) {
-    console.error('전역 오류 발생:', e.error);
-    if (responses.length > 0) {
-        emergencyBackup();
-    }
+    console.error('전역 오류:', e.error);
 });
 
 window.addEventListener('unhandledrejection', function(e) {
-    console.error('처리되지 않은 Promise 오류:', e.reason);
+    console.error('Promise 오류:', e.reason);
     e.preventDefault();
 });
 
-// 개발자 도구 객체
-window.nursingResearch = {
-    // 현재 상태 확인
-    getState: () => ({
-        participantData,
-        responses,
-        currentQuestion,
-        currentCondition,
-        currentScreen,
-        experimentStartTime,
-        conditions: conditions
-    }),
-    
-    // 설정 확인
-    checkConfig: () => {
-        console.log('📋 현재 설정:');
-        console.log('Form ID:', GOOGLE_FORMS_CONFIG.formId);
-        console.log('Entry IDs:', GOOGLE_FORMS_CONFIG.fields);
-        console.log('조건들:', conditions);
-        
-        if (GOOGLE_FORMS_CONFIG.formId === 'YOUR_FORM_ID') {
-            console.warn('❌ Form ID가 기본값으로 설정되어 있습니다!');
-        }
-    },
-    
-    // 백업 데이터 복구
-    recoverBackup: recoverBackupData,
-    
-    // 응급 백업
-    emergencyBackup: emergencyBackup,
-    
-    // 강제 다음 문제로 이동 (디버그용)
-    skipQuestion: () => {
-        console.log('강제로 다음 문제로 이동합니다.');
-        proceedToNextQuestion();
-    },
-    
-    // 실험 데이터 검증
-    validateData: () => {
-        const issues = [];
-        
-        if (!participantData.id) {
-            issues.push('참가자 ID가 없습니다.');
-        }
-        
-        if (!Array.isArray(responses)) {
-            issues.push('응답 데이터가 올바르지 않습니다.');
-        }
-        
-        if (typeof questions === 'undefined' || !Array.isArray(questions)) {
-            issues.push('문제 데이터가 로드되지 않았습니다.');
-        }
-        
-        if (issues.length > 0) {
-            console.warn('데이터 검증 실패:', issues);
-            return false;
-        }
-        
-        console.log('✅ 데이터 검증 통과');
-        return true;
-    },
-    
-    // 강제 화면 전환 (디버그용)
-    goToScreen: (screenId) => {
-        console.log(`강제 화면 전환: ${screenId}`);
-        showScreen(screenId);
-    }
-};
-
-console.log('🚀 간호연구 프로젝트 초기화 완료 (최종 수정 버전)');
-console.log('📖 개발자 도구: window.nursingResearch 객체를 사용하세요.');
-console.log('⚙️ 설정 확인: window.nursingResearch.checkConfig()');
-console.log('💾 백업 복구: window.nursingResearch.recoverBackup()');
-console.log('🚨 응급 백업: window.nursingResearch.emergencyBackup()');
-console.log('🔍 데이터 검증: window.nursingResearch.validateData()');
-console.log('🎮 화면 전환: window.nursingResearch.goToScreen("screenId")');
+console.log('✅ 간호연구 프로젝트 초기화 완료');
