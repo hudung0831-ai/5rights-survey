@@ -24,13 +24,6 @@ const practiceQuestions = [
     }
 ];
 
-// 실험 조건들
-const conditions = [
-    { name: '압박 상황', time: 5, label: 'pressure' },
-    { name: '보통 상황', time: 9, label: 'normal' },
-    { name: '여유 상황', time: 12, label: 'relaxed' }
-];
-
 // 실제 실험 문항들 (30개) - 환자 정보만 수정됨
 const questions = [
     {
@@ -680,3 +673,4 @@ const questions = [
         correct: 2
     }
 ];
+
