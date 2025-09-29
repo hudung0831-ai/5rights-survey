@@ -10,7 +10,7 @@ const GOOGLE_FORMS_CONFIG = {
 };
 
 // 전역 변수들
-let currentScreen = 'participantScreen';  // 수정: 첫 화면과 일치
+let currentScreen = 'startScreen';
 let currentQuestion = 0;
 let currentCondition = 0;
 let timeLeft = 5;
